@@ -1,3 +1,4 @@
+import 'package:actividad_05/routes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -20,7 +21,10 @@ class TextWithIconImplementation extends StatelessWidget {
             label, 
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)
             ),
-          Icon(Icons.arrow_forward, size: 30)
+          IconButton(
+            icon: const Icon(Icons.arrow_forward), 
+            onPressed: () => Navigator.pushNamed(context, ROUTE_NAMES[label])
+          )
         ],
       ),
     );

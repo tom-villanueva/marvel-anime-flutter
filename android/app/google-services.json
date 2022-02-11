@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "974581874146",
+    "project_id": "marvel-anime-flutter",
+    "storage_bucket": "marvel-anime-flutter.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:974581874146:android:cd7d3c93fcfbca1b194dbb",
+        "android_client_info": {
+          "package_name": "com.example.actividad_05"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "974581874146-efrqha8peroais69evio3gejmqbuo2mr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCn_jijauZF0BdzkAFpGhVsGhLyH8Ppaec"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "974581874146-efrqha8peroais69evio3gejmqbuo2mr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

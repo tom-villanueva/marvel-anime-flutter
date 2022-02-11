@@ -160,6 +160,11 @@ class MarvelApiService {
           .then(
               (response) => MarvelResponse<Comic>.fromRawJson(response.body));
 
+  Future<MarvelResponse<Comic>> getPaginatedComics(int offset) =>
+    http
+        .get(_buildUri('/comics', queryParams: {"orderBy": "-modified", "offset": offset.toString()}))
+        .then((response) => MarvelResponse<Comic>.fromRawJson(response.body));         
+
   //
   // Events
   //
@@ -202,6 +207,11 @@ class MarvelApiService {
           .then(
               (response) => MarvelResponse<MarvelEvent>.fromRawJson(response.body));
 
+  Future<MarvelResponse<MarvelEvent>> getPaginatedEvents(int offset) =>
+    http
+        .get(_buildUri('/events', queryParams: {"orderBy": "-modified", "offset": offset.toString()}))
+        .then((response) => MarvelResponse<MarvelEvent>.fromRawJson(response.body));            
+
   //
   // Creators
   //
@@ -239,4 +249,9 @@ class MarvelApiService {
               queryParams: null))
           .then((response) =>
               MarvelResponse<Creator>.fromRawJson(response.body));
+
+  Future<MarvelResponse<Creator>> getPaginatedCreators(int offset) =>
+    http
+        .get(_buildUri('/creators', queryParams: {"orderBy": "-modified", "offset": offset.toString()}))
+        .then((response) => MarvelResponse<Creator>.fromRawJson(response.body));              
 }

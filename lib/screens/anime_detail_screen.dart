@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:graphql_flutter/graphql_flutter.dart' as graphql;
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 final ANIME_DETAIL_QUERY = r"""
 query media($id: Int, $type: MediaType, $isAdult: Boolean) {
@@ -228,9 +231,10 @@ query media($id: Int, $type: MediaType, $isAdult: Boolean) {
 """;
 
 class AnimeDetailScreen extends StatefulWidget {
-  const AnimeDetailScreen({Key key, this.anime}) : super(key: key);
+  const AnimeDetailScreen({Key key, this.anime, this.entity}) : super(key: key);
 
   final String anime;
+  final dynamic entity; 
 
   @override
   _AnimeDetailScreenState createState() => _AnimeDetailScreenState();
@@ -238,6 +242,8 @@ class AnimeDetailScreen extends StatefulWidget {
 
 class _AnimeDetailScreenState extends State<AnimeDetailScreen> {
   List<dynamic> favouritedAnimeIds = [];
+  double starsRating = 0.0;
+  final database = FirebaseDatabase.instance.ref(); 
 
   toggleFavourite(int animeId) => () async {
         setState(() {
@@ -295,28 +301,54 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen> {
     );
   }
 
+  getEntityPath() {
+    int widgetId = widget.entity['id'];
+    return '/animes/$widgetId/stars';
+  }
+
+  getOrCreateStarsRating() async {
+    DatabaseReference ref = database.child(getEntityPath());
+
+    DatabaseEvent event = await ref.once();
+
+    print('value: ');
+    print(event.snapshot.value);
+
+    if(event.snapshot.value == null) {
+      ref.set(0.0);//{'stars': 0.0});
+      starsRating = 0.0;
+    } else {
+      starsRating = event.snapshot.value;
+    }
+
+    print('rating: ' + starsRating.toString());
+
+  }
+
   @override
   void initState() {
     super.initState();
     getFavouriteAnimes();
+    getOrCreateStarsRating();
   }
 
   @override
   Widget build(BuildContext context) {
     final dynamic anime = ModalRoute.of(context).settings.arguments;
+    final starsRef = database.child(getEntityPath());
 
     return Scaffold(
-        body: Query(
-            options: QueryOptions(
-                document: gql(ANIME_DETAIL_QUERY),
+        body: graphql.Query(
+            options: graphql.QueryOptions(
+                document: graphql.gql(ANIME_DETAIL_QUERY),
                 variables: {
                   "id": anime["id"],
                   "type": "ANIME",
                   "isAdult": false
                 },
-                fetchPolicy: FetchPolicy.noCache),
-            builder: (QueryResult result,
-                {VoidCallback refetch, FetchMore fetchMore}) {
+                fetchPolicy: graphql.FetchPolicy.noCache),
+            builder: (graphql.QueryResult result,
+                {VoidCallback refetch, graphql.FetchMore fetchMore}) {
               if (result.hasException) {
                 print(result.exception);
                 return Text(result.exception.toString());
@@ -367,7 +399,12 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen> {
                         color: Colors.black,
                       ),
                       IconButton(
-                        onPressed: () => print('Share'),
+                        onPressed: () {
+                          String animeName = anime['title']['userPreferred'];
+                          Share.share(
+                            "Checkout this anime $animeName",
+                          );
+                        },
                         icon: Icon(Icons.share),
                         iconSize: 35.0,
                         color: Colors.black,
@@ -386,9 +423,20 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen> {
                         textAlign: TextAlign.center,
                       ),
                       SizedBox(height: 12.0),
-                      Text(
-                        '⭐ ⭐ ⭐ ⭐ ⭐',
-                        style: TextStyle(fontSize: 25.0),
+                      RatingBar.builder(
+                        initialRating: starsRating,
+                        minRating: 1,
+                        direction: Axis.horizontal,
+                        allowHalfRating: false,
+                        itemCount: 5,
+                        itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                        itemBuilder: (context, _) => Icon(
+                          Icons.star,
+                          color: Colors.amber,
+                        ),
+                        onRatingUpdate: (rating) {
+                          starsRef.set(rating);
+                        },
                       ),
                       SizedBox(height: 15.0),
                       Container(

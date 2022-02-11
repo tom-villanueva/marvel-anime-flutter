@@ -38,7 +38,7 @@ class Comic {
   int id;
   int digitalId;
   String title;
-  int issueNumber;
+  num issueNumber;
   String variantDescription;
   String description;
   String modified;
