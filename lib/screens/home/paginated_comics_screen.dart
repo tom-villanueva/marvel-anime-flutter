@@ -47,13 +47,24 @@ class _PaginatedComicsScreenState extends State<PaginatedComicsScreen> {
       return Scaffold(
         body:Column(
          children:<Widget>[
-          Container(
-            margin: EdgeInsets.only(left: 10, right: 10, top: 50),
-            child: Text('Last Comics', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600))
-          ),
+          Row(
+            children: [
+              IconButton(
+                onPressed: () => {Navigator.of(context).pop()},
+                icon: Icon(Icons.arrow_back),
+                iconSize: 35.0,
+                color: Colors.black,
+              ),
+              Container(
+                margin: EdgeInsets.only(left: 75),
+                child: Text('Last Comics', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600))
+              ),
+            ],
+          ), 
           Expanded(
             child: PagedListView<int, Comic>(
               scrollDirection: Axis.vertical,
+              padding: EdgeInsets.only(left: 20, right: 20),
               pagingController: _pagingController,
               builderDelegate: PagedChildBuilderDelegate<Comic>(
                 itemBuilder: (context, item, index) => GestureDetector(

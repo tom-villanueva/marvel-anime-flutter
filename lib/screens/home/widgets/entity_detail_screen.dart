@@ -114,9 +114,13 @@ class _EntityDetailScreenState extends State<EntityDetailScreen> {
 
     if(event.snapshot.value == null) {
       ref.set(0.0);//{'stars': 0.0});
+      setState(() {
       starsRating = 0.0;
+            });
     } else {
-      starsRating = event.snapshot.value;
+      setState(() {
+      starsRating = (event.snapshot.value as num).toDouble();
+            });
     }
 
     print('rating: ' + starsRating.toString());
@@ -182,6 +186,9 @@ class _EntityDetailScreenState extends State<EntityDetailScreen> {
                 minRating: 1,
                 direction: Axis.horizontal,
                 allowHalfRating: false,
+                glow: true,
+                glowRadius: 5,
+                glowColor: Colors.amber,
                 itemCount: 5,
                 itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
                 itemBuilder: (context, _) => Icon(

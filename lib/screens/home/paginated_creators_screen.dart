@@ -46,15 +46,26 @@ class _PaginatedCreatorsScreenState extends State<PaginatedCreatorsScreen> {
       return Scaffold(
         body:Column(
          children:<Widget>[
-          Container(
-            margin: EdgeInsets.only(left: 10, right: 10, top: 50),
-            child: Text('New Creators',  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600))
+          Row(
+            children: [
+              IconButton(
+                onPressed: () => {Navigator.of(context).pop()},
+                icon: Icon(Icons.arrow_back),
+                iconSize: 35.0,
+                color: Colors.black,
+              ),
+              Container(
+                margin: EdgeInsets.only(left: 75),
+                child: Text('New creators', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600))
+              ),
+            ],
           ),
           Expanded(
             
             child: PagedListView<int, Creator>(
               scrollDirection: Axis.vertical,
               pagingController: _pagingController,
+              padding: EdgeInsets.only(left: 20, right: 20),
               builderDelegate: PagedChildBuilderDelegate<Creator>(
                 itemBuilder: (context, item, index) => GestureDetector(
                       onTap: () => Navigator.pushNamed(context, ROUTE_NAMES['CREATOR_DETAIL'], arguments: item),

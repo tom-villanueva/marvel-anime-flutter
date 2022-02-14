@@ -46,14 +46,25 @@ class _PaginatedEventsScreenState extends State<PaginatedEventsScreen> {
       return Scaffold(
         body:Column(
          children:<Widget>[
-          Container(
-            margin: EdgeInsets.only(left: 10, right: 10, top: 50),
-            child: Text('Last Events', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600))
+          Row(
+            children: [
+              IconButton(
+                onPressed: () => {Navigator.of(context).pop()},
+                icon: Icon(Icons.arrow_back),
+                iconSize: 35.0,
+                color: Colors.black,
+              ),
+              Container(
+                margin: EdgeInsets.only(left: 75),
+                child: Text('Last events', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600))
+              ),
+            ],
           ),
           Expanded(
             child: PagedListView<int, MarvelEvent>(
               scrollDirection: Axis.vertical,
               pagingController: _pagingController,
+              padding: EdgeInsets.only(left: 20, right: 20),
               builderDelegate: PagedChildBuilderDelegate<MarvelEvent>(
                 itemBuilder: (context, item, index) => GestureDetector(
                       onTap: () => Navigator.pushNamed(context, ROUTE_NAMES['EVENT_DETAIL'], arguments: item),

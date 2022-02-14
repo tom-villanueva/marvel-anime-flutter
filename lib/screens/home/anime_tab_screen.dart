@@ -124,11 +124,11 @@ class AnimeCardList extends StatelessWidget {
               itemCount: media.length,
               itemBuilder: (context, index) {
                 return GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, ROUTE_NAMES['ANIME_DETAIL'],
-                          arguments: media[index]).then(this.ref);
-                    },
-                    child: AnimeCard(media: media[index]));
+                  onTap: () {
+                    Navigator.pushNamed(context, ROUTE_NAMES['ANIME_DETAIL'],
+                        arguments: media[index]).then(this.ref);
+                  },
+                  child: AnimeCard(media: media[index]));
               }),
         ),
       ],

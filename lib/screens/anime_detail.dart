@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'anime_detail_screen.dart';
 
-class CharacterDetailScreen extends StatelessWidget {
-  const CharacterDetailScreen({Key key}) : super(key: key);
+class AniDetailScreen extends StatelessWidget {
+  const AniDetailScreen({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

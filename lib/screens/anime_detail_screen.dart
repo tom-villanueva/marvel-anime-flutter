@@ -311,18 +311,16 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen> {
 
     DatabaseEvent event = await ref.once();
 
-    print('value: ');
-    print(event.snapshot.value);
-
     if(event.snapshot.value == null) {
       ref.set(0.0);//{'stars': 0.0});
+      setState(() {
       starsRating = 0.0;
+            });
     } else {
-      starsRating = event.snapshot.value;
+      setState(() {
+      starsRating = (event.snapshot.value as num).toDouble();
+            });
     }
-
-    print('rating: ' + starsRating.toString());
-
   }
 
   @override
