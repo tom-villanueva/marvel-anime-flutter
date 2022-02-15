@@ -80,14 +80,39 @@ class PaginatedAnimeAllTimeScreen extends StatelessWidget {
                 child: Container(
                   child: ListView.builder(
                       scrollDirection: Axis.vertical,
-                      itemCount: result.data["popular"]["media"].length,
+                      itemCount: result.data["popular"]["media"].length + 1,
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onTap: () {
                             Navigator.pushNamed(context, ROUTE_NAMES['ANIME_DETAIL'],
                                 arguments: result.data["popular"]["media"][index]);
                           },
-                          child: AnimeCard(media: result.data["popular"]["media"][index]));
+                          child: index == result.data["popular"]["media"].length 
+                                ? ElevatedButton(
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Text("Ver más"),
+                                      ],
+                                    ),
+                                    onPressed: hasNextPage ? 
+                                    () => fetchMore(
+                                      FetchMoreOptions.partial(
+                                        variables: {'page': pageToFetch},
+                                        updateQuery: (existing, newAnimes) => ({
+                                          'popular': {
+                                            'pageInfo': newAnimes['popular']['pageInfo'],
+                                            'media': [
+                                              ...existing['popular']['media'],
+                                              ...newAnimes['popular']['media']
+                                            ],
+                                          }
+                                        }),
+                                      ),
+                                    ) 
+                                    : null
+                                  )
+                                : AnimeCard(media: result.data["popular"]["media"][index]));
                       }),
                 ),
               ), 
@@ -95,30 +120,7 @@ class PaginatedAnimeAllTimeScreen extends StatelessWidget {
                 ? Center(
                     child: CircularProgressIndicator(),
                   )
-                : ElevatedButton(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text("Ver más"),
-                  ],
-                ),
-                onPressed: hasNextPage ? 
-                () => fetchMore(
-                  FetchMoreOptions.partial(
-                    variables: {'page': pageToFetch},
-                    updateQuery: (existing, newAnimes) => ({
-                      'popular': {
-                        'pageInfo': newAnimes['popular']['pageInfo'],
-                        'media': [
-                          ...existing['popular']['media'],
-                          ...newAnimes['popular']['media']
-                        ],
-                      }
-                    }),
-                  ),
-                ) 
-                : null
-              )
+                : Icon(Icons.arrow_downward)
             ],
           )
           );

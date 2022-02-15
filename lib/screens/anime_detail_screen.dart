@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart' as graphql;
 import 'package:intl/intl.dart';
@@ -243,7 +244,9 @@ class AnimeDetailScreen extends StatefulWidget {
 class _AnimeDetailScreenState extends State<AnimeDetailScreen> {
   List<dynamic> favouritedAnimeIds = [];
   double starsRating = 0.0;
+
   final database = FirebaseDatabase.instance.ref(); 
+  StreamSubscription _starsRatingStream;
 
   toggleFavourite(int animeId) => () async {
         setState(() {
@@ -306,6 +309,15 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen> {
     return '/animes/$widgetId/stars';
   }
 
+  void _activateListeners() {
+    _starsRatingStream = 
+    database.child(getEntityPath()).onValue.listen((event) {
+      setState(() {
+        starsRating = (event.snapshot.value as num).toDouble();
+            });
+    });
+  }
+
   getOrCreateStarsRating() async {
     DatabaseReference ref = database.child(getEntityPath());
 
@@ -316,11 +328,13 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen> {
       setState(() {
       starsRating = 0.0;
             });
-    } else {
+    } /*else {
       setState(() {
       starsRating = (event.snapshot.value as num).toDouble();
             });
-    }
+    }*/
+    _activateListeners();
+
   }
 
   @override
@@ -534,6 +548,11 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen> {
               );
             }));
   }
+  @override
+    void deactivate() {
+      _starsRatingStream.cancel();
+      super.deactivate();
+    }
 }
 
 class BtnFavourite extends StatelessWidget {

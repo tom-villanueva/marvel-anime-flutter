@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:actividad_05/models/character.dart';
 import 'package:actividad_05/models/comic.dart';
 import 'package:actividad_05/models/creator.dart';
@@ -40,6 +42,32 @@ class _EntityDetailScreenState extends State<EntityDetailScreen> {
   double starsRating = 0.0;
 
   final database = FirebaseDatabase.instance.ref();
+  StreamSubscription _starsRatingStream;
+
+  getEntityPath() {
+    int widgetId = widget.entity.id;
+
+    if (widget.type == Character) {
+      return '/characters/$widgetId/stars';
+    } else if (widget.type == Serie) {
+      return '/series/$widgetId/stars';
+    } else if (widget.type == Comic) {
+      return '/comics/$widgetId/stars';
+    } else if (widget.type == MarvelEvent) {
+      return '/events/$widgetId/stars';
+    } else if (widget.type == Creator) {
+      return '/creators/$widgetId/stars';
+    }
+  }
+
+  void _activateListeners() {
+    _starsRatingStream = 
+    database.child(getEntityPath()).onValue.listen((event) {
+      setState(() {
+        starsRating = (event.snapshot.value as num).toDouble();
+            });
+    });
+  }
 
   toggleFavourite(dynamic entity) => () async {
     setState(() {
@@ -88,22 +116,6 @@ class _EntityDetailScreenState extends State<EntityDetailScreen> {
     }  
   }
 
-  getEntityPath() {
-    int widgetId = widget.entity.id;
-
-    if (widget.type == Character) {
-      return '/characters/$widgetId/stars';
-    } else if (widget.type == Serie) {
-      return '/series/$widgetId/stars';
-    } else if (widget.type == Comic) {
-      return '/comics/$widgetId/stars';
-    } else if (widget.type == MarvelEvent) {
-      return '/events/$widgetId/stars';
-    } else if (widget.type == Creator) {
-      return '/creators/$widgetId/stars';
-    }
-  }
-
   getOrCreateStarsRating() async {
     DatabaseReference ref = database.child(getEntityPath());
 
@@ -117,11 +129,13 @@ class _EntityDetailScreenState extends State<EntityDetailScreen> {
       setState(() {
       starsRating = 0.0;
             });
-    } else {
+    } 
+    /*else {
       setState(() {
       starsRating = (event.snapshot.value as num).toDouble();
             });
-    }
+    }*/
+    _activateListeners();
 
     print('rating: ' + starsRating.toString());
 
@@ -231,5 +245,11 @@ class _EntityDetailScreenState extends State<EntityDetailScreen> {
       ),
     );
   }
+
+  @override
+    void deactivate() {
+      _starsRatingStream.cancel();
+      super.deactivate();
+    }
 
 }

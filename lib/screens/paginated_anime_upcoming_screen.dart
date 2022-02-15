@@ -82,14 +82,39 @@ class PaginatedAnimeUpcomingScreen extends StatelessWidget {
                 child: Container(
                   child: ListView.builder(
                       scrollDirection: Axis.vertical,
-                      itemCount: result.data["nextSeason"]["media"].length,
+                      itemCount: result.data["nextSeason"]["media"].length + 1,
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onTap: () {
                             Navigator.pushNamed(context, ROUTE_NAMES['ANIME_DETAIL'],
                                 arguments: result.data["nextSeason"]["media"][index]);
                           },
-                          child: AnimeCard(media: result.data["nextSeason"]["media"][index]));
+                          child: index == result.data["nextSeason"]["media"].length 
+                                ? ElevatedButton(
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Text("Ver más"),
+                                      ],
+                                    ),
+                                    onPressed: hasNextPage ? 
+                                    () => fetchMore(
+                                      FetchMoreOptions.partial(
+                                        variables: {'page': pageToFetch},
+                                        updateQuery: (existing, newAnimes) => ({
+                                          'nextSeason': {
+                                            'pageInfo': newAnimes['nextSeason']['pageInfo'],
+                                            'media': [
+                                              ...existing['nextSeason']['media'],
+                                              ...newAnimes['nextSeason']['media']
+                                            ],
+                                          }
+                                        }),
+                                      ),
+                                    ) 
+                                    : null
+                                  )
+                                : AnimeCard(media: result.data["nextSeason"]["media"][index]));
                       }),
                 ),
               ), 
@@ -97,30 +122,7 @@ class PaginatedAnimeUpcomingScreen extends StatelessWidget {
                 ? Center(
                     child: CircularProgressIndicator(),
                   )
-                : ElevatedButton(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text("Ver más"),
-                  ],
-                ),
-                onPressed: hasNextPage ? 
-                () => fetchMore(
-                  FetchMoreOptions.partial(
-                    variables: {'page': pageToFetch, "nextSeason": "SUMMER", "nextYear": 2021},
-                    updateQuery: (existing, newAnimes) => ({
-                      'nextSeason': {
-                        'pageInfo': newAnimes['nextSeason']['pageInfo'],
-                        'media': [
-                          ...existing['nextSeason']['media'],
-                          ...newAnimes['nextSeason']['media']
-                        ],
-                      }
-                    }),
-                  ),
-                ) 
-                : null
-              )
+                : Icon(Icons.arrow_downward)
             ],
           )
           );

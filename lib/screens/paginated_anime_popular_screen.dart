@@ -82,14 +82,39 @@ class PaginatedAnimeSeasonScreen extends StatelessWidget {
                 child: Container(
                   child: ListView.builder(
                       scrollDirection: Axis.vertical,
-                      itemCount: result.data["season"]["media"].length,
+                      itemCount: result.data["season"]["media"].length + 1,
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onTap: () {
                             Navigator.pushNamed(context, ROUTE_NAMES['ANIME_DETAIL'],
                                 arguments: result.data["season"]["media"][index]);
                           },
-                          child: AnimeCard(media: result.data["season"]["media"][index]));
+                          child: index == result.data["season"]["media"].length 
+                                ? ElevatedButton(
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Text("Ver más"),
+                                      ],
+                                    ),
+                                    onPressed: hasNextPage ? 
+                                    () => fetchMore(
+                                      FetchMoreOptions.partial(
+                                        variables: {'page': pageToFetch},
+                                        updateQuery: (existing, newAnimes) => ({
+                                          'season': {
+                                            'pageInfo': newAnimes['season']['pageInfo'],
+                                            'media': [
+                                              ...existing['season']['media'],
+                                              ...newAnimes['season']['media']
+                                            ],
+                                          }
+                                        }),
+                                      ),
+                                    ) 
+                                    : null
+                                  )
+                                : AnimeCard(media: result.data["season"]["media"][index]));
                       }),
                 ),
               ), 
@@ -97,30 +122,7 @@ class PaginatedAnimeSeasonScreen extends StatelessWidget {
                 ? Center(
                     child: CircularProgressIndicator(),
                   )
-                : ElevatedButton(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text("Ver más"),
-                  ],
-                ),
-                onPressed: hasNextPage ? 
-                () => fetchMore(
-                  FetchMoreOptions.partial(
-                    variables: {'page': pageToFetch, "season": "SPRING", "seasonYear": 2021,},
-                    updateQuery: (existing, newAnimes) => ({
-                      'season': {
-                        'pageInfo': newAnimes['season']['pageInfo'],
-                        'media': [
-                          ...existing['season']['media'],
-                          ...newAnimes['season']['media']
-                        ],
-                      }
-                    }),
-                  ),
-                ) 
-                : null
-              )
+                : Icon(Icons.arrow_downward)
             ],
           )
           );

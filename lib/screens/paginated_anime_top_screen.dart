@@ -80,14 +80,39 @@ class PaginatedAnimeTopScreen extends StatelessWidget {
                 child: Container(
                   child: ListView.builder(
                       scrollDirection: Axis.vertical,
-                      itemCount: result.data["top"]["media"].length,
+                      itemCount: result.data["top"]["media"].length + 1,
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onTap: () {
                             Navigator.pushNamed(context, ROUTE_NAMES['ANIME_DETAIL'],
                                 arguments: result.data["top"]["media"][index]);
                           },
-                          child: AnimeCard(media: result.data["top"]["media"][index]));
+                          child: index == result.data["top"]["media"].length 
+                                ? ElevatedButton(
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Text("Ver más"),
+                                      ],
+                                    ),
+                                    onPressed: hasNextPage ? 
+                                    () => fetchMore(
+                                      FetchMoreOptions.partial(
+                                        variables: {'page': pageToFetch},
+                                        updateQuery: (existing, newAnimes) => ({
+                                          'top': {
+                                            'pageInfo': newAnimes['top']['pageInfo'],
+                                            'media': [
+                                              ...existing['top']['media'],
+                                              ...newAnimes['top']['media']
+                                            ],
+                                          }
+                                        }),
+                                      ),
+                                    ) 
+                                    : null
+                                  )
+                                : AnimeCard(media: result.data["top"]["media"][index]));
                       }),
                 ),
               ), 
@@ -95,30 +120,7 @@ class PaginatedAnimeTopScreen extends StatelessWidget {
                 ? Center(
                     child: CircularProgressIndicator(),
                   )
-                : ElevatedButton(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text("Ver más"),
-                  ],
-                ),
-                onPressed: hasNextPage ? 
-                () => fetchMore(
-                  FetchMoreOptions.partial(
-                    variables: {'page': pageToFetch},
-                    updateQuery: (existing, newAnimes) => ({
-                      'top': {
-                        'pageInfo': newAnimes['top']['pageInfo'],
-                        'media': [
-                          ...existing['top']['media'],
-                          ...newAnimes['top']['media']
-                        ],
-                      }
-                    }),
-                  ),
-                ) 
-                : null
-              )
+                : Icon(Icons.arrow_downward)
             ],
           )
           );

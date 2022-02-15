@@ -79,15 +79,41 @@ class PaginatedAnimeTrendingScreen extends StatelessWidget {
               Expanded(
                 child: Container(
                   child: ListView.builder(
+
                       scrollDirection: Axis.vertical,
-                      itemCount: result.data["trending"]["media"].length,
+                      itemCount: result.data["trending"]["media"].length + 1,
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onTap: () {
                             Navigator.pushNamed(context, ROUTE_NAMES['ANIME_DETAIL'],
                                 arguments: result.data["trending"]["media"][index]);
                           },
-                          child: AnimeCard(media: result.data["trending"]["media"][index]));
+                          child: index == result.data["trending"]["media"].length 
+                                ? ElevatedButton(
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Text("Ver más"),
+                                      ],
+                                    ),
+                                    onPressed: hasNextPage ? 
+                                    () => fetchMore(
+                                      FetchMoreOptions.partial(
+                                        variables: {'page': pageToFetch},
+                                        updateQuery: (existing, newAnimes) => ({
+                                          'trending': {
+                                            'pageInfo': newAnimes['trending']['pageInfo'],
+                                            'media': [
+                                              ...existing['trending']['media'],
+                                              ...newAnimes['trending']['media']
+                                            ],
+                                          }
+                                        }),
+                                      ),
+                                    ) 
+                                    : null
+                                  )
+                                : AnimeCard(media: result.data["trending"]["media"][index]));
                       }),
                 ),
               ), 
@@ -95,30 +121,7 @@ class PaginatedAnimeTrendingScreen extends StatelessWidget {
                 ? Center(
                     child: CircularProgressIndicator(),
                   )
-                : ElevatedButton(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text("Ver más"),
-                  ],
-                ),
-                onPressed: hasNextPage ? 
-                () => fetchMore(
-                  FetchMoreOptions.partial(
-                    variables: {'page': pageToFetch},
-                    updateQuery: (existing, newAnimes) => ({
-                      'trending': {
-                        'pageInfo': newAnimes['trending']['pageInfo'],
-                        'media': [
-                          ...existing['trending']['media'],
-                          ...newAnimes['trending']['media']
-                        ],
-                      }
-                    }),
-                  ),
-                ) 
-                : null
-              )
+                : Icon(Icons.arrow_downward)
             ],
           )
           );
